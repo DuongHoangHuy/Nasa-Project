@@ -26,7 +26,7 @@ const loadPlanetsData = ()=>{
         .on('error', (err)=>{
             reject(err)
         })
-        .on('end', async ()=>{ 
+        .on('end', ()=>{ 
             resolve()
         })
     })

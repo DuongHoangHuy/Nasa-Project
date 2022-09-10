@@ -1,12 +1,13 @@
 const Planet = require('../models/Planet')
 
-const getAllPlanets = async ()=>{
+const getAllPlanets = async (req, res)=>{
     try{
-        return await Planet.find({}, {
+        const planetData =  await Planet.find({}, {
             "_id": 0, "__v": 0
         })
+        return res.status(200).json(planetData)
     }catch(err){
-        console.log("Can not get all palnets: " + err)
+        console.log(`Cannot get all planets with error: ${err}`)
     }
 }
 
