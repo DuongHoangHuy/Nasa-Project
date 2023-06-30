@@ -4,7 +4,7 @@
   "description": "",
   "main": "test.js",
   "scripts": {
-    "start": "node src/server.js"
+    "start": "node src/server.js",
     "test": "jest",
     "watch": "nodemon src/server.js"
   },
