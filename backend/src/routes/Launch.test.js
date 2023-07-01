@@ -19,10 +19,10 @@ describe('Launches API', () => {
     await disconnectMongoDB();
   });
 
-  describe('Test GET /launches', () => {
+  describe('Test GET /launch', () => {
     test('It should respond with 200 success', async () => {
       const response = await request(app)
-        .get('/v1/launch')
+        .get('/v1/launch?page=1&limit=10')
         .expect('Content-Type', /json/)
         .expect(200);
     });
