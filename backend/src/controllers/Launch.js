@@ -2,6 +2,19 @@ const Launch = require('../models/Launch')
 const Planet = require('../models/Planet')
 const axios =require('axios')
 const DEFAULT_FLIGHT_NUMBER = 100
+const DEFAULT_PAGE_NUMBER = 1;
+const DEFAULT_PAGE_LIMIT = 0;
+
+const getPagination = (query) => {
+  const page = Math.abs(query.page) || DEFAULT_PAGE_NUMBER;
+  const limit = Math.abs(query.limit) || DEFAULT_PAGE_LIMIT;
+  const skip = (page - 1) * limit;
+
+  return {
+    skip,
+    limit,
+  };
+}
 
 const getAllLaunches = async ({page, limit})=>{
   return await Launch.find({}, {
@@ -51,9 +64,7 @@ const deleteLaunch = async (deleteId)=>{
 
 const httpGetAllLaunches = async (req, res)=>{
   try {
-    const {page, limit} = req.query
-    // validate page & limit
-    const allLaunches = await getAllLaunches({page, limit})
+    const allLaunches = await getAllLaunches(getPagination(req.query))
     res.status(200).json(allLaunches)
   } catch(err){
     console.log(err)
