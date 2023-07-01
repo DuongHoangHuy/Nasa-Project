@@ -9,7 +9,6 @@ const getPagination = (query) => {
   const page = Math.abs(query.page) || DEFAULT_PAGE_NUMBER;
   const limit = Math.abs(query.limit) || DEFAULT_PAGE_LIMIT;
   const skip = (page - 1) * limit;
-  console.log(limit, skip)
 
   return {
     skip,
@@ -17,12 +16,12 @@ const getPagination = (query) => {
   };
 }
 
-const getAllLaunches = async ({page, limit})=>{
+const getAllLaunches = async ({skip, limit})=>{
   return await Launch.find({}, {
     "_id": 0, "__v": 0
   })
   .sort({flightNumber: 1})
-  .skip((page-1)*limit)
+  .skip(skip)
   .limit(limit)
 }
 
