@@ -18,7 +18,7 @@ const addNewLaunch = async (newLaunch)=>{
     if(!isTargetExist){
       return {
         ok: false,
-        error: "Target is not exist"
+        error: "Planet is not exist"
       }
     }
 
