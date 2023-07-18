@@ -1,6 +1,8 @@
 const Launch = require('../models/Launch')
 const Planet = require('../models/Planet')
 const axios =require('axios')
+const {redisGet, redisSet, redisHSet, redisHVals, redisExist, redisHDel} = require('../services/connect_redis')
+
 const DEFAULT_FLIGHT_NUMBER = 100
 const DEFAULT_PAGE_NUMBER = 1;
 const DEFAULT_PAGE_LIMIT = 0;
@@ -44,6 +46,7 @@ const addNewLaunch = async (newLaunch)=>{
       success: true,
     })
     await saveLaunch(newLaunch)
+
     return {
       ok: true
     }
@@ -62,9 +65,23 @@ const deleteLaunch = async (deleteId)=>{
   return (res.modifiedCount === 1)
 }
 
+// const cacheAllLaucnh = async (key, allLaunches) => {
+//   for(const launch of allLaunches) {
+//     await redisHSet('all-launches', launch.flightNumber, launch)
+//   }
+// }
+
 const httpGetAllLaunches = async (req, res)=>{
   try {
-    const allLaunches = await getAllLaunches(getPagination(req.query))
+    let allLaunches
+    const cachedData = await redisHVals('all-launches')
+    if (cachedData.length) {
+      allLaunches = cachedData
+    } else {
+      allLaunches =  await getAllLaunches(getPagination(req.query))
+      allLaunches.forEach(async launch => await redisHSet('all-launches', launch.flightNumber, launch))
+    }
+    console.log(cachedData.length ? 'cached' : 'not cached')
     res.status(200).json(allLaunches)
   } catch(err){
     console.log(err)
@@ -88,7 +105,16 @@ const httpAddNewLaunch = async (req, res)=> {
       });
     }
   
-    await addNewLaunch (launch);
+    const {ok} = await addNewLaunch (launch);
+
+    if(ok) {
+      // cached
+      const isCached = await redisExist('all-launches')
+      if(isCached) {
+        await redisHSet('all-launches', launch.flightNumber, launch)
+        console.log("add to cache")
+      }
+    }
     return res.status(201).json(launch);
 
   } catch (err){
@@ -113,6 +139,13 @@ const httpDeleteLaunch = async (req, res)=>{
       return res.status(400).json({
         error: 'Launch not aborted',
       });
+    }
+    
+    // Cached
+    const isCached = await redisExist('all-launches')
+    if(isCached) {
+      await redisHSet('all-launches', launchId, await Launch.findOne({flightNumber: launchId}))
+      console.log('remove from cache')
     }
   
     return res.status(200).json({

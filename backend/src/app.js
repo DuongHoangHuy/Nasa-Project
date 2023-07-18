@@ -5,6 +5,7 @@ const v1Router = require('./routes/v1Router')
 const path = require('path')
 const whitelist = ['http://localhost:3000']
 const morgan = require('morgan')
+
 const corsOptions = {
   origin: function (origin, callback) {
     if (whitelist.indexOf(origin) !== -1) {

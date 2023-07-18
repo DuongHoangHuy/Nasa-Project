@@ -2,6 +2,7 @@ require('dotenv').config()
 const http = require('http')
 const app = require('./app')
 const mongoDB = require('./services/connect_mongo')
+const {connectRedis} = require('./services/connect_redis')
 const {loadPlanetsData} = require('./data/PlanetData')
 const {loadLaunchesData} = require('./controllers/Launch')
 const PORT = process.env.PORT || 8080 
@@ -11,6 +12,7 @@ const server = http.createServer(app)
 const startServer = async ()=>{
     try {
         await mongoDB.connectMongoDB()
+        await connectRedis()
         await loadPlanetsData()
         await loadLaunchesData()
         server.listen(PORT, ()=>{

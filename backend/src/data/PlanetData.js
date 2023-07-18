@@ -27,8 +27,8 @@ const loadPlanetsData = ()=>{
         .on('error', (err)=>{
             reject(err)
         })
-        .on('end', ()=>{
-            console.log(`Find ${cnt} habitable planets`)
+        .on('end', async ()=>{
+            // console.log(`Find ${cnt} habitable planets`)
             resolve()
         })
     })
